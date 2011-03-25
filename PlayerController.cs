@@ -62,6 +62,10 @@ namespace gameBungee
                 Player.isMovingRight    = true;
                 Player.isJumping        = false;
             }
+            if (keyboardState.IsKeyDown(Keys.S))
+            {
+                InteractionButtonS();
+            }
             if (gamePadState.IsButtonDown(Buttons.A) ||
                  keyboardState.IsKeyDown(Keys.Space) ||
                  keyboardState.IsKeyDown(Keys.Z))
@@ -104,22 +108,7 @@ namespace gameBungee
                     Player.isMovingRight = true;
 
                 Player.angleTir = -Math.Atan(diff.Y / diff.X);
-                Player.distanceTir = Math.Sqrt(diff.X * diff.X + diff.Y * diff.Y);
-                /*
-                 * Vector2 positionTete = new Vector2();
-                positionTete = Player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
-
-                Matrix proj = Matrix.CreateOrthographic(800, 480, 0, 1);
-                Matrix view = Matrix.Identity;
-
-                var screenPositon = graphics.Viewport.Project(new Vector3(positionTete, 0),
-                                    proj, view, Matrix.Identity);
-                positionTete.X = screenPositon.X;
-                positionTete.Y = screenPositon.Y;
-                Vector2 diff = new Vector2(mouseState.X - positionTete.X, positionTete.Y - mouseState.Y);
-
-                Player.angleTir = Math.Atan(diff.Y / diff.X);
-                Player.distanceTir = Math.Sqrt(diff.X * diff.X + diff.Y * diff.Y);*/
+                Player.distanceTir = (float)Math.Sqrt(diff.X * diff.X + diff.Y * diff.Y);
             }
             if (mouseState.LeftButton == ButtonState.Pressed)
             {
@@ -256,12 +245,22 @@ namespace gameBungee
             {
                 if (Player.bulletJuncture != null && Player.bulletJuncture.isHung)
                 {
-                    Vector2 t1 = new Vector2(0.0f, 6000.0f);
-                    Vector2 t2 = new Vector2(0.0f, 0.0f);
+                    Vector2 t2 = Vector2.Zero;
+                    Vector2 direction = Player.bulletJuncture.positionBullet - Player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
+                    direction.Normalize();
+                    Vector2 t1 = direction * 1000f;
+
                     Player.PlayerPhysic.FixtureObject.Body.ApplyLinearImpulse(ref t1, ref t2);
                     Player.PlayerPhysic.FixtureObject.Body.Awake = true;
+
+                    Player.bulletJuncture.juncture.Length -= 10;
                 }
             }
+        }
+
+        private void InteractionButtonS()
+        {
+            Player.bulletJuncture.juncture.Length += 10;
         }
 
     }

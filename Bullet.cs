@@ -19,7 +19,8 @@ namespace gameBungee
         private ObjCercle bullet;
         private float radius;
         private ObjEdge liana;
-        private FarseerPhysics.Dynamics.Joints.SliderJoint juncture; //la jointure avec un objet
+        //public FarseerPhysics.Dynamics.Joints.SliderJoint juncture; //la jointure avec un objet
+        public FarseerPhysics.Dynamics.Joints.DistanceJoint juncture; //la jointure avec un objet
         private Fixture juncturePoint;
 
         private Vector2 AnchorPointJuncturePoint = Vector2.Zero;
@@ -30,6 +31,11 @@ namespace gameBungee
         public bool isHung = false;
 
         World worldPhysic;
+
+        public Vector2 positionBullet
+        {
+            get { return bullet.FixtureObject.Body.Position; }
+        }
 
         public Bullet(Vector2 position, float radius, Fixture juncturePoint, World worldPhysic)
         {
@@ -63,7 +69,8 @@ namespace gameBungee
         public Boolean collisionBullet(Fixture fixA, Fixture fixB, Contact contact)
         {
             bullet.FixtureObject.Body.BodyType = BodyType.Static;
-            juncture = JointFactory.CreateSliderJoint(worldPhysic, juncturePoint.Body, bullet.FixtureObject.Body, AnchorPointJuncturePoint, AnchorPointBullet, minLength, maxLength);
+            //juncture = JointFactory.CreateSliderJoint(worldPhysic, juncturePoint.Body, bullet.FixtureObject.Body, AnchorPointJuncturePoint, AnchorPointBullet, minLength, maxLength);
+            juncture = JointFactory.CreateDistanceJoint(worldPhysic, juncturePoint.Body, bullet.FixtureObject.Body, AnchorPointJuncturePoint, AnchorPointBullet);
             isHung = true;
             return false;
         }
@@ -75,13 +82,19 @@ namespace gameBungee
             if (liana.FixtureObject != null)
                 worldPhysic.RemoveBody(liana.FixtureObject.Body);
         }
-        public void update(Vector2 posHead)
+        public void update(Vector2 posHead, float distance)
         {
             if(liana != null)
                 worldPhysic.RemoveBody(liana.FixtureObject.Body);
             liana = new ObjEdge(posHead, bullet.FixtureObject.Body.Position, worldPhysic);
             liana.FixtureObject.CollisionFilter.RemoveCollidesWithCategory(Category.All);
             liana.addDisplayer();
+            if (juncture != null)
+            {
+                juncture.Length = distance;
+                //juncture.MinLength = distance;
+                //juncture.MaxLength = distance;
+            }
         }
 
         public void Draw(GraphicsDevice Graphics)

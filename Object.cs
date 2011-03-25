@@ -26,6 +26,11 @@ namespace gameBungee
         protected const Category RectangleCategory = Category.Cat3;
         protected const Category CircleCategory = Category.Cat4;
 
+        public Vector2 Position
+        {
+            get { return ObjectPhysic.First().Body.Position; }
+        }
+
         public Fixture FixtureObject
         {
             get { return ObjectPhysic.First(); }

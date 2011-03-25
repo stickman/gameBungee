@@ -44,7 +44,7 @@ namespace gameBungee
 
         private Boolean Flip            = false;
         public double angleTir          = 0.0d;
-        public double distanceTir       = 0.0d;
+        public float  distanceTir       = 0.0f;
 
         public Character(Texture2D tex, GraphicsDevice Graphics, ref Matrix proj, ref Matrix view, World worldPhysic, ContentManager Content)
         {
@@ -121,8 +121,11 @@ namespace gameBungee
                 bulletJuncture.shootBullet(Flip, angleTir);
                 isShooting = false;
             }
-            if(bulletJuncture != null)
-                bulletJuncture.update(ObjectPhysicCircleTete.FixtureObject.Body.Position);
+            if (bulletJuncture != null)
+            {
+                distanceTir = (ObjectPhysicCircleTete.Position - bulletJuncture.positionBullet).Length();
+                bulletJuncture.update(ObjectPhysicCircleTete.FixtureObject.Body.Position,distanceTir);
+            }
         }
 
         public void Draw(GameTime gameTime, GraphicsDevice Graphics)
