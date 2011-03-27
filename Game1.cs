@@ -42,9 +42,10 @@ namespace gameBungee
 
 
             this.graphics.IsFullScreen = false;
-            this.graphics.PreferredBackBufferWidth = 800;
-            this.graphics.PreferredBackBufferHeight = 480;
-
+            //this.graphics.PreferredBackBufferWidth = 800;
+            //this.graphics.PreferredBackBufferHeight = 480;
+            this.graphics.ApplyChanges();
+         
             this.Window.Title = "Premier programme";
             this.Window.AllowUserResizing = false;
 
@@ -62,7 +63,7 @@ namespace gameBungee
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            Matrix proj = Matrix.CreateOrthographic(160, 120, 0, 1);
+            Matrix proj = Matrix.CreateOrthographic(GraphicsDevice.DisplayMode.Width/4, GraphicsDevice.DisplayMode.Height/4, 0, 1);
             Matrix view = Matrix.Identity;
             
             _clampTextureAddressMode = new SamplerState

@@ -24,10 +24,11 @@ namespace gameBungee
         ContentManager content;
         List<FarseerPhysics.Dynamics.Joints.SliderJoint> jointList;
         GraphicsDevice graphics;
-        private static VertexDeclaration _vertexDeclaration;
-        private static BasicEffect _effect;
-        private Matrix proj;
-        private Matrix view;
+        CameraController cam;
+        //private static VertexDeclaration _vertexDeclaration;
+        //private static BasicEffect _effect;
+        //private Matrix proj;
+        //private Matrix view;
         
         SpriteFont spriteFont;
 
@@ -56,18 +57,11 @@ namespace gameBungee
         public void LoadContent(GraphicsDevice Graphics, ContentManager Content, ref Matrix proj, ref Matrix view)
         {
             this.graphics = Graphics;
-            _vertexDeclaration = new VertexDeclaration(VertexPositionColor.VertexDeclaration.GetVertexElements());
+            //_vertexDeclaration = new VertexDeclaration(VertexPositionColor.VertexDeclaration.GetVertexElements());
+            cam = new CameraController(new Rectangle(), proj, view, Graphics);
             
-            _effect = new BasicEffect(Graphics);
-            _effect.VertexColorEnabled = true;
-            _effect.View = view;
-            _effect.Projection = proj;
-
-            this.view = view;
-            this.proj = proj;
-
             Texture2D texture = Content.Load<Texture2D>("textures/Idle");
-            Player = new Character(texture, Graphics, ref proj, ref view, worldPhysic, Content);
+            Player = new Character(texture, Graphics, ref proj, ref view, worldPhysic, Content, cam.effect);
 
             Controller = new PlayerController();
 
@@ -125,10 +119,11 @@ namespace gameBungee
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
             KeyboardState keyboardState = Keyboard.GetState();
             
-            Controller.UpdateInteraction(Player, graphics, view, proj);
+            Controller.UpdateInteraction(Player, graphics, cam.view, cam.proj);
 
             worldPhysic.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.002f);
-            Player.update();
+            Player.update(cam.view);
+            cam.update(Player, graphics);
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -138,7 +133,7 @@ namespace gameBungee
             MouseState ms = Mouse.GetState();
 
             var playerPos = graphics.Viewport.Project(new Vector3(Player.ObjectPhysicCircleTete.FixtureObject.Body.Position, 0),
-                                proj, view, Matrix.Identity);
+                                cam.proj, cam.view, Matrix.Identity);
 
             string texte = string.Format("souris {0:d}:{1:d}\ntete {2:000}:{3:000}\n{4:00.00} images / sec", ms.X, ms.Y, playerPos.X, playerPos.Y, FPS);//string.Format("{0:00.00} images / sec", FPS);
             Vector2 taille = this.spriteFont.MeasureString(texte);
@@ -154,7 +149,7 @@ namespace gameBungee
             rasterizerState1.CullMode = CullMode.None;
             graphics.RasterizerState = rasterizerState1;
 
-            _effect.Techniques[0].Passes[0].Apply();
+            cam.effect.Techniques[0].Passes[0].Apply();
 
 
             //obj1.Draw(gameTime, spriteBatch, SpriteEffects.None);

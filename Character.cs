@@ -46,9 +46,10 @@ namespace gameBungee
         public double angleTir          = 0.0d;
         public float  distanceTir       = 0.0f;
 
-        public Character(Texture2D tex, GraphicsDevice Graphics, ref Matrix proj, ref Matrix view, World worldPhysic, ContentManager Content)
+        public Character(Texture2D tex, GraphicsDevice Graphics, ref Matrix proj, ref Matrix view, World worldPhysic, ContentManager Content, BasicEffect effectPlayer)
         {
             this.worldPhysic = worldPhysic;
+            //_effectPlayer = effectPlayer;
             _effectPlayer = new BasicEffect(Graphics);
             _effectPlayer.EnableDefaultLighting();
             _effectPlayer.World = Matrix.Identity;
@@ -109,8 +110,9 @@ namespace gameBungee
          //   juncture = JointFactory.CreateSliderJoint(worldPhysic, ObjectPhysicCircleTete.FixtureObject.Body, Obj2.Body, AnchorPoint, AnchorPoint2, minLength, maxLength);
         }
 
-        public void update()
+        public void update(Matrix view)
         {
+            _effectPlayer.View = view;
             if (isShooting)
             {
                 if (bulletJuncture != null)

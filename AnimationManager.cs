@@ -59,7 +59,7 @@ namespace gameBungee
 
     class AnimationCharacter : AnimationManager
     {
-        private BasicEffect effectPlayer;
+        public BasicEffect effectPlayer;
 
         public AnimationCharacter(BasicEffect _effectPlayer)
         {
