@@ -232,11 +232,26 @@ namespace gameBungee
                         if ((contact.FixtureA.FixtureId == Player.ObjectPhysicCircle.FixtureObject.FixtureId
                          || contact.FixtureB.FixtureId == Player.ObjectPhysicCircle.FixtureObject.FixtureId) && contact.IsTouching())
                         {
-                            Vector2 t1 = new Vector2(0.0f, 6000.0f);
-                            Vector2 t2 = new Vector2(0.0f, 0.0f);
-                            Player.PlayerPhysic.FixtureObject.Body.ApplyLinearImpulse(ref t1, ref t2);
-                            Player.PlayerPhysic.FixtureObject.Body.Awake = true;
-                            isOnContact = true;
+                            if (Player.bulletJuncture != null && Player.bulletJuncture.isHung)
+                            {
+                                Vector2 t2 = Vector2.Zero;
+                                Vector2 direction = Player.bulletJuncture.positionBullet - Player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
+                                direction.Normalize();
+                                Vector2 t1 = direction * 1000f;
+
+                                Player.PlayerPhysic.FixtureObject.Body.ApplyLinearImpulse(ref t1, ref t2);
+                                Player.PlayerPhysic.FixtureObject.Body.Awake = true;
+
+                                Player.bulletJuncture.juncture.Length -= 10;
+                            }
+                            else
+                            {
+                                Vector2 t1 = new Vector2(0.0f, 6000.0f);
+                                Vector2 t2 = new Vector2(0.0f, 0.0f);
+                                Player.PlayerPhysic.FixtureObject.Body.ApplyLinearImpulse(ref t1, ref t2);
+                                Player.PlayerPhysic.FixtureObject.Body.Awake = true;
+                                isOnContact = true;
+                            }
                         }
                     }
                 contact = contact.Next;
@@ -260,7 +275,16 @@ namespace gameBungee
 
         private void InteractionButtonS()
         {
+            Vector2 t2 = Vector2.Zero;
+            Vector2 direction = Player.bulletJuncture.positionBullet - Player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
+            direction.Normalize();
+            Vector2 t1 = direction * -1000f;
+
+            Player.PlayerPhysic.FixtureObject.Body.ApplyLinearImpulse(ref t1, ref t2);
+            Player.PlayerPhysic.FixtureObject.Body.Awake = true;
+
             Player.bulletJuncture.juncture.Length += 10;
+
         }
 
     }
