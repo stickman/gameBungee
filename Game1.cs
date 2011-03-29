@@ -49,7 +49,7 @@ namespace gameBungee
             this.Window.Title = "Premier programme";
             this.Window.AllowUserResizing = false;
 
-            level = new Level(Services);
+            level = new Level(Services, this.Window.ClientBounds.Width, this.Window.ClientBounds.Height);
             base.IsMouseVisible = true;
             base.Initialize();
         }

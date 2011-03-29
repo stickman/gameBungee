@@ -47,9 +47,14 @@ namespace gameBungee
 
         Character Player;
         PlayerController Controller;
-        
-        public Level(IServiceProvider serviceProvider)
+
+        int Width;
+        int Height;
+        public Level(IServiceProvider serviceProvider, int width, int height)
         {
+            Width = width;
+            Height = height;
+
             worldPhysic = new World(new Vector2(0, -80.0f));
             content = new ContentManager(serviceProvider, "Content");
         }
@@ -58,7 +63,7 @@ namespace gameBungee
         {
             this.graphics = Graphics;
             //_vertexDeclaration = new VertexDeclaration(VertexPositionColor.VertexDeclaration.GetVertexElements());
-            cam = new CameraController(new Rectangle(), proj, view, Graphics);
+            cam = new CameraController(new Rectangle(Width / 4, Height / 4, Width / 2, Height / 2), proj, view, Graphics);
             
             Texture2D texture = Content.Load<Texture2D>("textures/Idle");
             Player = new Character(texture, Graphics, ref proj, ref view, worldPhysic, Content, cam.effect);
@@ -72,9 +77,9 @@ namespace gameBungee
 
             obj2 = new ObjRectange(new Vector2(0, -30), 80, 5, 0.0f, worldPhysic, BodyType.Static);
             obj2.addDisplayer();
-            obj21 = new ObjRectange(new Vector2(40, 0), 80, 5, (float)Math.PI/2.0f, worldPhysic, BodyType.Static);
+            obj21 = new ObjRectange(new Vector2(80, 0), 10, 5, (float)Math.PI/2.0f, worldPhysic, BodyType.Static);
             obj21.addDisplayer();
-            obj22 = new ObjRectange(new Vector2(-40, 0), 80, 5, (float)Math.PI / 2.0f, worldPhysic, BodyType.Static);
+            obj22 = new ObjRectange(new Vector2(-80, 0), 10, 5, (float)Math.PI / 2.0f, worldPhysic, BodyType.Static);
             obj22.addDisplayer();
             obj23 = new ObjRectange(new Vector2(0, 30), 80, 5, 0.0f, worldPhysic, BodyType.Static);
             obj23.addDisplayer();

@@ -18,6 +18,7 @@ namespace gameBungee
         private static BasicEffect Effect;
 
         private Vector3 camPosition;
+        private Vector3 cameraLookat;
 
         public Matrix proj
         {
@@ -36,6 +37,7 @@ namespace gameBungee
 
         public CameraController(Rectangle border, Matrix proj, Matrix view, GraphicsDevice Graphics)
         {
+            cameraLookat = Vector3.Zero;
             camPosition = new Vector3(0, 0, 1);
             Border = border;
             Proj = proj;
@@ -46,11 +48,36 @@ namespace gameBungee
             Effect.View = view;
             Effect.Projection = proj;
         }
-        public void update(Character player, GraphicsDevice Graphics)
+        public void update(Character player, GraphicsDevice graphics)
         {
-            camPosition = new Vector3(0, 0, 1) + new Vector3(player.ObjectPhysicCircleTete.Position.X, 0, 0);
-            Vector3 cameraLookat = camPosition - new Vector3(0,0,1);
-            View = Matrix.CreateLookAt(camPosition, cameraLookat, new Vector3(0.0f, 1.0f, 0.0f)); 
+            Vector2 positionTete = new Vector2();
+            positionTete = player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
+
+            var onScreenPositon = graphics.Viewport.Project(new Vector3(positionTete, 0),
+                                proj, view, Matrix.Identity);
+            Vector3 rightAndDownShift = onScreenPositon - new Vector3(Border.X + Border.Width, Border.Y + Border.Height, 0);
+            Vector3 leftAndUpShift = onScreenPositon - new Vector3(Border.X, Border.Y, 0);
+
+            if (rightAndDownShift.X > 0)
+            {
+                camPosition = camPosition + new Vector3(1, 0, 0);
+                Border.X += (int)camPosition.X;
+            }
+            if (rightAndDownShift.Y > 0)
+            {
+                //camPosition = new Vector3(0, 0, 1) + new Vector3(0, rightAndDownShift.Y, 0);
+            }
+            if (leftAndUpShift.X < 0)
+            {
+                camPosition = camPosition + new Vector3(-1, 0, 0);
+                Border.X += -1;
+            }
+            if (leftAndUpShift.Y < 0)
+            {
+                //camPosition = new Vector3(0, 0, 1) + new Vector3(0, leftAndUpShift.Y, 0);
+            }
+            cameraLookat = camPosition - new Vector3(0, 0, 1);
+            View = Matrix.CreateLookAt(camPosition, cameraLookat, new Vector3(0.0f, 1.0f, 0.0f));
             Effect.View = view;
             Effect.Projection = proj;
         }
