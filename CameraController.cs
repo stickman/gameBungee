@@ -10,45 +10,64 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace gameBungee
 {
-    class CameraController
+    static public class CameraController
     {
-        private Rectangle Border;
-        private Matrix Proj;
-        private Matrix View;
-        private static BasicEffect Effect;
+        static private Rectangle Border;
+        static private BasicEffect Effect;
 
-        private Vector3 camPosition;
-        private Vector3 cameraLookat;
+        static private Vector3 camPosition;
+        static private Vector3 cameraLookat;
 
-        public Matrix proj
+        static private Matrix Proj;
+        static private Matrix View;
+
+        static private int zoom;
+
+        static public Matrix proj
         {
             get { return Proj; }
         }
 
-        public Matrix view
+        static public Matrix view
         {
             get { return View; }
         }
 
-        public BasicEffect effect
+        static public BasicEffect effect
         {
             get { return Effect; }
         }
 
-        public CameraController(Rectangle border, Matrix proj, Matrix view, GraphicsDevice Graphics)
+        static public void Inialized(Rectangle border, GraphicsDevice Graphics)
         {
             cameraLookat = Vector3.Zero;
             camPosition = new Vector3(0, 0, 1);
             Border = border;
-            Proj = proj;
-            View = view;
+
+            zoom = 4;
+
+            Proj = Matrix.CreateOrthographic(EnvironmentVariable.width / zoom, EnvironmentVariable.height / zoom, 0, 1);
+            View = Matrix.Identity;
 
             Effect = new BasicEffect(Graphics);
             Effect.VertexColorEnabled = true;
             Effect.View = view;
             Effect.Projection = proj;
         }
-        public void update(Character player, GraphicsDevice graphics)
+
+        static public void zoomOut()
+        {
+            zoom++;
+            Proj = Matrix.CreateOrthographic(EnvironmentVariable.width / zoom, EnvironmentVariable.height / zoom, 0, 1);
+        }
+
+        static public void zoomIn()
+        {
+            zoom--;
+            Proj = Matrix.CreateOrthographic(EnvironmentVariable.width / zoom, EnvironmentVariable.height / zoom, 0, 1); 
+        }
+
+        static public void update (Character player, GraphicsDevice graphics)
         {
             Vector2 positionTete = new Vector2();
             positionTete = player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
@@ -77,7 +96,9 @@ namespace gameBungee
                 //camPosition = new Vector3(0, 0, 1) + new Vector3(0, leftAndUpShift.Y, 0);
             }
             cameraLookat = camPosition - new Vector3(0, 0, 1);
+
             View = Matrix.CreateLookAt(camPosition, cameraLookat, new Vector3(0.0f, 1.0f, 0.0f));
+            
             Effect.View = view;
             Effect.Projection = proj;
         }

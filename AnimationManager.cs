@@ -13,7 +13,7 @@ using FarseerPhysics.Collision.Shapes;
 
 namespace gameBungee
 {
-    class AnimationManager
+    public class AnimationManager
     {
         protected Animation Anim;
         protected int i_FrameCurrent;
@@ -57,7 +57,7 @@ namespace gameBungee
         }
     }
 
-    class AnimationCharacter : AnimationManager
+    public class AnimationCharacter : AnimationManager
     {
         public BasicEffect effectPlayer;
 
@@ -65,7 +65,7 @@ namespace gameBungee
         {
             effectPlayer = _effectPlayer;
         }
-        public void Draw(GameTime gameTime, Fixture ObjectPhysic, GraphicsDevice Graphics, Boolean Flip)
+        public void Draw(GameTime gameTime, Fixture ObjectPhysic, Boolean Flip)
         {
             if (Animation == null)
                 throw new NotSupportedException("[ERROR AnimationCharacter] Pas d'animation chargée...");
@@ -95,14 +95,14 @@ namespace gameBungee
             Quad quad = new Quad(new Vector3(ObjectPhysic.Body.Position, 0), Vector3.Backward, vectoreUp, 10, 10, i_FrameCurrent, this.i_nbrFrame, Flip);
             
             effectPlayer.Techniques[0].Passes[0].Apply();
-            Graphics.DrawUserIndexedPrimitives
+            EnvironmentVariable.graphics.GraphicsDevice.DrawUserIndexedPrimitives
                     <VertexPositionNormalTexture>(PrimitiveType.TriangleList,
                     quad.Vertices, 0, 4,
                     quad.Indexes, 0, 2);
         }
     }
 
-    class AnimationObjet : AnimationManager
+    public class AnimationObjet : AnimationManager
     {
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch, Vector2 position, SpriteEffects spriteEffects, float angleTir, Rectangle source)
         {
@@ -127,7 +127,7 @@ namespace gameBungee
             spriteBatch.Draw(Animation.Texture, position, source, Color.White, angleTir, new Vector2((float)source.Width / 2.0f, (float)source.Height / 2.0f), 1.0f, spriteEffects, 0.0f);
         }
         
-        public void DrawCircle(Fixture ObjectPhysic, GraphicsDevice Graphics)
+        public void DrawCircle(Fixture ObjectPhysic)
         {
             CircleShape circle = (CircleShape)ObjectPhysic.Shape;
             Transform xf;
@@ -163,10 +163,10 @@ namespace gameBungee
 
                 theta += increment;
             }
-            Graphics.DrawUserPrimitives(PrimitiveType.TriangleList, _vertsFill, 0, (_vertsFill.Count()/3)-2);
+            EnvironmentVariable.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, _vertsFill, 0, (_vertsFill.Count() / 3) - 2);
         }
 
-        public void DrawEdge(List<Fixture> ObjectPhysicList, GraphicsDevice Graphics)
+        public void DrawEdge(List<Fixture> ObjectPhysicList)
         {
             Color colorFill = new Color(0.9f, 0.7f, 0.7f, 0.5f);
             VertexPositionColor[] _vertsFill = new VertexPositionColor[4];
@@ -180,10 +180,10 @@ namespace gameBungee
                 _vertsFill[1].Position = new Vector3(poly.Vertex2, 0.0f);
                 _vertsFill[1].Color = colorFill;
            }
-           Graphics.DrawUserPrimitives(PrimitiveType.LineList, _vertsFill, 0, 2);        
+            EnvironmentVariable.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, _vertsFill, 0, 2);        
         }
 
-        public void Draw(List<Fixture> ObjectPhysicList, GraphicsDevice Graphics)
+        public void Draw(List<Fixture> ObjectPhysicList)
         {
             foreach (Fixture ObjectPhysic in ObjectPhysicList)
             {
@@ -203,7 +203,7 @@ namespace gameBungee
                     _vertsFill[3 * i + 2].Position = new Vector3(MathUtils.Multiply(ref xf, poly.Vertices[i + 2]), 0);
                     _vertsFill[3 * i + 2].Color = new Color(0.9f, 0.7f, 0.7f);
                 }
-                Graphics.DrawUserPrimitives(PrimitiveType.TriangleList, _vertsFill, 0, poly.Vertices.Count - 2);
+                EnvironmentVariable.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, _vertsFill, 0, poly.Vertices.Count - 2);
             }
         }
     }

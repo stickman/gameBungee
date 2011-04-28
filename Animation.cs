@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace gameBungee
 {
-    class Animation
+    public class Animation
     {
         Texture2D texture;              //Texture de l'animation
         float f_FrameTime;              //Permet de connaitre le temps d'affichage de chaque frame de l'animation

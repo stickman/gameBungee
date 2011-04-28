@@ -24,7 +24,6 @@ namespace gameBungee
         ContentManager content;
         List<FarseerPhysics.Dynamics.Joints.SliderJoint> jointList;
         GraphicsDevice graphics;
-        CameraController cam;
         //private static VertexDeclaration _vertexDeclaration;
         //private static BasicEffect _effect;
         //private Matrix proj;
@@ -59,14 +58,14 @@ namespace gameBungee
             content = new ContentManager(serviceProvider, "Content");
         }
 
-        public void LoadContent(GraphicsDevice Graphics, ContentManager Content, ref Matrix proj, ref Matrix view)
+        public void LoadContent(GraphicsDevice Graphics, ContentManager Content)
         {
             this.graphics = Graphics;
             //_vertexDeclaration = new VertexDeclaration(VertexPositionColor.VertexDeclaration.GetVertexElements());
-            cam = new CameraController(new Rectangle(Width / 4, Height / 4, Width / 2, Height / 2), proj, view, Graphics);
+            CameraController.Inialized(new Rectangle(Width / 4, Height / 4, Width / 2, Height / 2), EnvironmentVariable.graphics.GraphicsDevice);
             
             Texture2D texture = Content.Load<Texture2D>("textures/Idle");
-            Player = new Character(texture, Graphics, ref proj, ref view, worldPhysic, Content, cam.effect);
+            Player = new Character(texture, worldPhysic, Content, CameraController.effect);
 
             Controller = new PlayerController();
 
@@ -123,12 +122,12 @@ namespace gameBungee
 
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One);
             KeyboardState keyboardState = Keyboard.GetState();
-            
-            Controller.UpdateInteraction(Player, graphics, cam.view, cam.proj);
+
+            Controller.UpdateInteraction(Player, graphics);
 
             worldPhysic.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.002f);
-            Player.update(cam.view);
-            cam.update(Player, graphics);
+            Player.update();
+            CameraController.update(Player, EnvironmentVariable.graphics.GraphicsDevice);
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -137,8 +136,8 @@ namespace gameBungee
             //Formatage de la chaine
             MouseState ms = Mouse.GetState();
 
-            var playerPos = graphics.Viewport.Project(new Vector3(Player.ObjectPhysicCircleTete.FixtureObject.Body.Position, 0),
-                                cam.proj, cam.view, Matrix.Identity);
+            var playerPos = EnvironmentVariable.graphics.GraphicsDevice.Viewport.Project(new Vector3(Player.ObjectPhysicCircleTete.FixtureObject.Body.Position, 0),
+                                CameraController.proj, CameraController.view, Matrix.Identity);
 
             string texte = string.Format("souris {0:d}:{1:d}\ntete {2:000}:{3:000}\n{4:00.00} images / sec", ms.X, ms.Y, playerPos.X, playerPos.Y, FPS);//string.Format("{0:00.00} images / sec", FPS);
             Vector2 taille = this.spriteFont.MeasureString(texte);
@@ -152,27 +151,27 @@ namespace gameBungee
             */
             RasterizerState rasterizerState1 = new RasterizerState();
             rasterizerState1.CullMode = CullMode.None;
-            graphics.RasterizerState = rasterizerState1;
+            EnvironmentVariable.graphics.GraphicsDevice.RasterizerState = rasterizerState1;
 
-            cam.effect.Techniques[0].Passes[0].Apply();
+            CameraController.effect.Techniques[0].Passes[0].Apply();
 
 
             //obj1.Draw(gameTime, spriteBatch, SpriteEffects.None);
             //obj1.Draw(graphics);
-            obj2.Draw(graphics);
-            
-            obj21.Draw(graphics);
-            obj22.Draw(graphics);
-            obj23.Draw(graphics);
+            obj2.Draw();
 
-            platform1.Draw(graphics);
-            platform2.Draw(graphics);
+            obj21.Draw();
+            obj22.Draw();
+            obj23.Draw();
+
+            platform1.Draw();
+            platform2.Draw();
 
             //obj2.Draw(gameTime, spriteBatch, SpriteEffects.None);
             //obj3.Draw(graphics);
             //obj4.Draw(graphics);
 
-            Player.Draw(gameTime, graphics);
+            Player.Draw(gameTime);
 
             spriteBatch.Begin();
             spriteBatch.DrawString(this.spriteFont, texte, new Vector2(this.graphics.Viewport.Width - taille.X, 5), Color.Green);

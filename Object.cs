@@ -15,7 +15,7 @@ using FarseerPhysics.Dynamics;
 
 namespace gameBungee
 {
-    class Object
+    public class Object
     {
         //protected Vector2 Position;
         protected List<Fixture> ObjectPhysic = new List<Fixture>();
@@ -53,7 +53,7 @@ namespace gameBungee
         }
     }
 
-    class ObjCercle : Object
+    public class ObjCercle : Object
     {
         private float radius;
 
@@ -83,13 +83,13 @@ namespace gameBungee
             //Position = InitialPosition;
             radius = InitialRadius;
         }
-        public void Draw(GraphicsDevice Graphics)
+        public void Draw()
         {            
-                A_Animation.DrawCircle(ObjectPhysic.First(), Graphics);
+                A_Animation.DrawCircle(ObjectPhysic.First());
         }
     }
 
-    class ObjRectange : Object
+    public class ObjRectange : Object
     {
         //new public List<Fixture> ObjectPhysic = new List<Fixture>();
         Vector2 size;
@@ -120,17 +120,17 @@ namespace gameBungee
             size.Y = height;
         }
 
-        public void Draw(GraphicsDevice Graphics)
+        public void Draw()
         {
-            A_Animation.Draw(ObjectPhysic, Graphics);
+            A_Animation.Draw(ObjectPhysic);
         }
-        public void Draw(GameTime gameTime, GraphicsDevice Graphics, Boolean Flip)
+        public void Draw(GameTime gameTime, Boolean Flip)
         {
-            A_AnimationChar.Draw(gameTime, ObjectPhysic.First(), Graphics, Flip);
+            A_AnimationChar.Draw(gameTime, ObjectPhysic.First(), Flip);
         }
     }
 
-    class ObjPolygon : Object
+    public class ObjPolygon : Object
     {
         //new List<Fixture> ObjectPhysic = new List<Fixture>();
 
@@ -156,22 +156,22 @@ namespace gameBungee
         }
 
 
-        public void Draw(GraphicsDevice Graphics)
+        public void Draw()
         {
-            A_Animation.Draw(ObjectPhysic, Graphics);
+            A_Animation.Draw(ObjectPhysic);
         }
     }
 
-    class ObjEdge : Object
+    public class ObjEdge : Object
     {
         public ObjEdge(Vector2 start, Vector2 end, World worldPhysic)
         {
             ObjectPhysic.Add(FixtureFactory.CreateEdge(worldPhysic, start, end));
             ObjectPhysic.First().Body.BodyType = BodyType.Kinematic;
         }
-        public void Draw(GraphicsDevice Graphics)
+        public void Draw()
         {
-            A_Animation.DrawEdge(ObjectPhysic, Graphics);
+            A_Animation.DrawEdge(ObjectPhysic);
         }
     }
 }

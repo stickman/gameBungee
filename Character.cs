@@ -14,7 +14,7 @@ using FarseerPhysics.Dynamics.Contacts;
 
 namespace gameBungee
 {
-    class Character
+    public class Character
     {
         private World worldPhysic;
         private BasicEffect _effectPlayer;
@@ -46,15 +46,15 @@ namespace gameBungee
         public double angleTir          = 0.0d;
         public float  distanceTir       = 0.0f;
 
-        public Character(Texture2D tex, GraphicsDevice Graphics, ref Matrix proj, ref Matrix view, World worldPhysic, ContentManager Content, BasicEffect effectPlayer)
+        public Character(Texture2D tex, World worldPhysic, ContentManager Content, BasicEffect effectPlayer)
         {
             this.worldPhysic = worldPhysic;
             //_effectPlayer = effectPlayer;
-            _effectPlayer = new BasicEffect(Graphics);
+            _effectPlayer = new BasicEffect(EnvironmentVariable.graphics.GraphicsDevice);
             _effectPlayer.EnableDefaultLighting();
             _effectPlayer.World = Matrix.Identity;
-            _effectPlayer.View = view;
-            _effectPlayer.Projection = proj;
+            _effectPlayer.View = CameraController.view;
+            _effectPlayer.Projection = CameraController.proj;
             _effectPlayer.TextureEnabled = true;
             _effectPlayer.Texture = tex;
 
@@ -110,9 +110,9 @@ namespace gameBungee
          //   juncture = JointFactory.CreateSliderJoint(worldPhysic, ObjectPhysicCircleTete.FixtureObject.Body, Obj2.Body, AnchorPoint, AnchorPoint2, minLength, maxLength);
         }
 
-        public void update(Matrix view)
+        public void update()
         {
-            _effectPlayer.View = view;
+            _effectPlayer.View = CameraController.view;
             if (isShooting)
             {
                 if (bulletJuncture != null)
@@ -130,13 +130,13 @@ namespace gameBungee
             }
         }
 
-        public void Draw(GameTime gameTime, GraphicsDevice Graphics)
+        public void Draw(GameTime gameTime)
         {
 
             //ObjectPhysicCircle.Draw(Graphics);
             //ObjectPhysicCircleTete.Draw(Graphics);
             if (bulletJuncture != null)
-                bulletJuncture.Draw(Graphics);
+                bulletJuncture.Draw(EnvironmentVariable.graphics.GraphicsDevice);
             if (isMoving)
             {
                 Flip = isMovingRight;
@@ -146,7 +146,7 @@ namespace gameBungee
                         RectangleTexture.addTexture(texJump, _effectPlayer, 0.05f);
                     else
                         _effectPlayer.Texture = texJump;
-                    RectangleTexture.Draw(gameTime, Graphics, Flip);
+                    RectangleTexture.Draw(gameTime, Flip);
                 }
                 else
                 {
@@ -156,7 +156,7 @@ namespace gameBungee
                             RectangleTexture.addTexture(texRun, _effectPlayer, 0.03f);
                         else
                             _effectPlayer.Texture = texRun;
-                        RectangleTexture.Draw(gameTime, Graphics, Flip);
+                        RectangleTexture.Draw(gameTime, Flip);
                     }
                     else //is moving left
                     {
@@ -164,7 +164,7 @@ namespace gameBungee
                             RectangleTexture.addTexture(texRun, _effectPlayer, 0.05f);
                         else
                             _effectPlayer.Texture = texRun;
-                        RectangleTexture.Draw(gameTime, Graphics, Flip);
+                        RectangleTexture.Draw(gameTime, Flip);
                     }
                 }
             }
@@ -175,7 +175,7 @@ namespace gameBungee
                     RectangleTexture.addTexture(texIdle, _effectPlayer, 0.0f);
                 else
                     _effectPlayer.Texture = texIdle;
-                RectangleTexture.Draw(gameTime, Graphics, Flip);
+                RectangleTexture.Draw(gameTime, Flip);
 
             }
 
@@ -186,7 +186,7 @@ namespace gameBungee
                 _effectPlayer.Texture = texWeapon;
 
 
-            RectangleTextureGun.Draw(gameTime, Graphics, Flip);
+            RectangleTextureGun.Draw(gameTime, Flip);
             
         }
     }

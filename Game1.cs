@@ -13,12 +13,18 @@ using Microsoft.Xna.Framework.Storage;
 
 namespace gameBungee
 {
+
+    static public class EnvironmentVariable
+    {
+        static public GraphicsDeviceManager graphics;
+        static public int width;
+        static public int height;
+    }
     /// <summary>
     /// This is the main type for your game
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
         private Level level;
@@ -26,7 +32,7 @@ namespace gameBungee
 
         public Game1()
         {
-            graphics = new GraphicsDeviceManager(this);
+            EnvironmentVariable.graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
@@ -41,10 +47,10 @@ namespace gameBungee
             // TODO: Add your initialization logic here
 
 
-            this.graphics.IsFullScreen = false;
+            EnvironmentVariable.graphics.IsFullScreen = false;
             //this.graphics.PreferredBackBufferWidth = 800;
             //this.graphics.PreferredBackBufferHeight = 480;
-            this.graphics.ApplyChanges();
+            EnvironmentVariable.graphics.ApplyChanges();
          
             this.Window.Title = "Premier programme";
             this.Window.AllowUserResizing = false;
@@ -61,18 +67,20 @@ namespace gameBungee
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteBatch = new SpriteBatch(EnvironmentVariable.graphics.GraphicsDevice);
 
-            Matrix proj = Matrix.CreateOrthographic(GraphicsDevice.DisplayMode.Width/4, GraphicsDevice.DisplayMode.Height/4, 0, 1);
-            Matrix view = Matrix.Identity;
-            
+            EnvironmentVariable.width = GraphicsDevice.DisplayMode.Width;
+            EnvironmentVariable.height= GraphicsDevice.DisplayMode.Height;
+
+            CameraController.Inialized(new Rectangle(EnvironmentVariable.width / 4, EnvironmentVariable.height / 4, EnvironmentVariable.width / 2, EnvironmentVariable.height / 2), EnvironmentVariable.graphics.GraphicsDevice);
+
             _clampTextureAddressMode = new SamplerState
             {
                 AddressU = TextureAddressMode.Clamp,
                 AddressV = TextureAddressMode.Clamp
-            }; 
+            };
 
-            level.LoadContent(graphics.GraphicsDevice, Content, ref proj, ref view);
+            level.LoadContent(EnvironmentVariable.graphics.GraphicsDevice, Content);
 
             // TODO: use this.Content to load your game content here
         }
@@ -94,7 +102,7 @@ namespace gameBungee
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
                 this.Exit();
 
             // TODO: Add your update logic here
@@ -111,7 +119,7 @@ namespace gameBungee
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            graphics.GraphicsDevice.SamplerStates[0] = _clampTextureAddressMode; 
+            EnvironmentVariable.graphics.GraphicsDevice.SamplerStates[0] = _clampTextureAddressMode; 
 
             level.Draw(gameTime, spriteBatch);
 

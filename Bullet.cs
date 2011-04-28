@@ -14,7 +14,7 @@ using FarseerPhysics.Dynamics.Contacts;
 
 namespace gameBungee
 {
-    class Bullet
+    public class Bullet
     {
         private ObjCercle bullet;
         private float radius;
@@ -100,8 +100,8 @@ namespace gameBungee
         public void Draw(GraphicsDevice Graphics)
         {
             if (liana != null)
-                liana.Draw(Graphics);
-            bullet.Draw(Graphics);
+                liana.Draw();
+            bullet.Draw();
         }
     }
 }

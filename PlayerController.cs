@@ -23,7 +23,7 @@ namespace gameBungee
 
         Character Player;
 
-        public void UpdateInteraction(Character player, GraphicsDevice graphics, Matrix view, Matrix proj)
+        public void UpdateInteraction(Character player, GraphicsDevice graphics)
         {
             gamePadState = GamePad.GetState(PlayerIndex.One);
             keyboardState = Keyboard.GetState();
@@ -97,7 +97,7 @@ namespace gameBungee
                 positionTete = Player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
 
                 var screenPositon = graphics.Viewport.Project(new Vector3(positionTete, 0),
-                                    proj, view, Matrix.Identity);
+                                    CameraController.proj, CameraController.view, Matrix.Identity);
                 positionTete.X = screenPositon.X;
                 positionTete.Y = screenPositon.Y;
                 Vector2 diff = new Vector2(mouseState.X - positionTete.X, mouseState.Y - positionTete.Y);
