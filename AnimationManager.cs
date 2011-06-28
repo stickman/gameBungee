@@ -15,7 +15,7 @@ namespace gameBungee
 {
     public class AnimationManager
     {
-        protected Animation Anim;
+        protected Animation Anim = null;
         protected int i_FrameCurrent;
         protected int i_nbrFrame;
         protected float f_Time;         //permet de savoir combien de temps c'est écoulé pour afficher la frame correspondante
@@ -44,28 +44,27 @@ namespace gameBungee
             get { return v2_Origin; }
         }
 
-        public void PlayAnimation(Animation anim)
+        public void PlayAnimation(Texture2D tex, float FrameTime, bool IsLooping)
         {
-            if (Anim == anim) //Si on a deja chargé la bonne animation
-                return;
-
-            this.Anim = anim;
+            this.Anim = new Animation(tex, FrameTime, true);
             this.i_FrameCurrent = 0;
             this.f_Time = 0.0f;
-            if (anim.Texture != null)
-                this.i_nbrFrame = anim.Texture.Width / anim.Texture.Height;
+            if (this.Anim.Texture != null)
+                this.i_nbrFrame = this.Anim.Texture.Width / this.Anim.Texture.Height;
+        }
+
+        public void update()
+        {
+            this.i_FrameCurrent = 0;
+            this.f_Time = 0.0f;
+            if (Anim.Texture != null)
+                this.i_nbrFrame = Anim.Texture.Width / Anim.Texture.Height;
         }
     }
 
     public class AnimationCharacter : AnimationManager
     {
-        public BasicEffect effectPlayer;
-
-        public AnimationCharacter(BasicEffect _effectPlayer)
-        {
-            effectPlayer = _effectPlayer;
-        }
-        public void Draw(GameTime gameTime, Fixture ObjectPhysic, Boolean Flip)
+        public void Draw(GameTime gameTime, Fixture ObjectPhysic, Vector2 size, Boolean Flip)
         {
             if (Animation == null)
                 throw new NotSupportedException("[ERROR AnimationCharacter] Pas d'animation chargée...");
@@ -85,16 +84,18 @@ namespace gameBungee
                     i_FrameCurrent = Math.Min(FrameCurrent + 1, Animation.Nbr_Frame - 1);
                 }
             }
-            
-            //Rectangle source = new Rectangle(FrameCurrent * Animation.Texture.Height, 0, Animation.Texture.Height, Animation.Texture.Height);
-            //spriteBatch.Draw(Animation.Texture, position, source, Color.White, angleTir, Origin, 1.0f, spriteEffects, 0.0f);
-            //effectPlayer.Texture = Anim.Texture;
 
             Vector3 vectoreUp = new Vector3((float)Math.Cos(ObjectPhysic.Body.Rotation + Math.PI / 2), (float)Math.Sin(ObjectPhysic.Body.Rotation + Math.PI / 2), 0f);
 
-            Quad quad = new Quad(new Vector3(ObjectPhysic.Body.Position, 0), Vector3.Backward, vectoreUp, 10, 10, i_FrameCurrent, this.i_nbrFrame, Flip);
+            Transform xf;
+            ObjectPhysic.Body.GetTransform(out xf);
+            Vector3 pos = new Vector3(MathUtils.Multiply(ref xf, ObjectPhysic.Body.Position), 0);
+            Quad quad = new Quad(pos, Vector3.Backward, vectoreUp, size.X, size.Y, ObjectPhysic, i_FrameCurrent, this.i_nbrFrame, Flip);
+
+            Anim.effectPlayer.View = CameraController.view;
+            Anim.effectPlayer.Projection = CameraController.proj;
             
-            effectPlayer.Techniques[0].Passes[0].Apply();
+            Anim.effectPlayer.Techniques[0].Passes[0].Apply();
             EnvironmentVariable.graphics.GraphicsDevice.DrawUserIndexedPrimitives
                     <VertexPositionNormalTexture>(PrimitiveType.TriangleList,
                     quad.Vertices, 0, 4,
@@ -127,7 +128,7 @@ namespace gameBungee
             spriteBatch.Draw(Animation.Texture, position, source, Color.White, angleTir, new Vector2((float)source.Width / 2.0f, (float)source.Height / 2.0f), 1.0f, spriteEffects, 0.0f);
         }
         
-        public void DrawCircle(Fixture ObjectPhysic)
+        public void DrawCircle(Fixture ObjectPhysic, Color colorFill)
         {
             CircleShape circle = (CircleShape)ObjectPhysic.Shape;
             Transform xf;
@@ -138,8 +139,6 @@ namespace gameBungee
             const int segments = 32;
             const double increment = Math.PI * 2.0 / segments;
             double theta = 0.0;
-
-            Color colorFill = new Color(0.9f, 0.7f, 0.7f, 0.5f);
 
             Vector2 v0 = center + radius * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta));
             theta += increment;
@@ -163,7 +162,7 @@ namespace gameBungee
 
                 theta += increment;
             }
-            EnvironmentVariable.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, _vertsFill, 0, (_vertsFill.Count() / 3) - 2);
+            EnvironmentVariable.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, _vertsFill, 0, (_vertsFill.Count() / 3)  );
         }
 
         public void DrawEdge(List<Fixture> ObjectPhysicList)
@@ -183,7 +182,7 @@ namespace gameBungee
             EnvironmentVariable.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, _vertsFill, 0, 2);        
         }
 
-        public void Draw(List<Fixture> ObjectPhysicList)
+        public void Draw(List<Fixture> ObjectPhysicList, Color color)
         {
             foreach (Fixture ObjectPhysic in ObjectPhysicList)
             {
@@ -195,13 +194,13 @@ namespace gameBungee
                 for (int i = 0; i < poly.Vertices.Count - 2; i++)
                 {
                     _vertsFill[3 * i].Position = new Vector3(MathUtils.Multiply(ref xf, poly.Vertices[0]), 0);
-                    _vertsFill[3 * i].Color = new Color(0.9f, 0.7f, 0.7f);
+                    _vertsFill[3 * i].Color = color;
 
                     _vertsFill[3 * i + 1].Position = new Vector3(MathUtils.Multiply(ref xf, poly.Vertices[i + 1]), 0);
-                    _vertsFill[3 * i + 1].Color = new Color(0.9f, 0.7f, 0.7f);
+                    _vertsFill[3 * i + 1].Color = color;
 
                     _vertsFill[3 * i + 2].Position = new Vector3(MathUtils.Multiply(ref xf, poly.Vertices[i + 2]), 0);
-                    _vertsFill[3 * i + 2].Color = new Color(0.9f, 0.7f, 0.7f);
+                    _vertsFill[3 * i + 2].Color = color;
                 }
                 EnvironmentVariable.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, _vertsFill, 0, poly.Vertices.Count - 2);
             }

@@ -7,6 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Content;
 
+using FarseerPhysics;
+using FarseerPhysics.Common;
+using FarseerPhysics.Dynamics;
+using FarseerPhysics.Collision;
+using FarseerPhysics.Collision.Shapes;
+
 namespace gameBungee
 {
     public struct Quad
@@ -18,7 +24,6 @@ namespace gameBungee
         private Vector3 LowerRight;
         private Vector3 Normal;
         private Vector3 Up;
-        private Vector3 Left;
 
         private float NbFrame;
 
@@ -28,8 +33,10 @@ namespace gameBungee
 
 
         public Quad(Vector3 origin, Vector3 normal, Vector3 up,
-            float width, float height, int i_FrameCurrent, int NbFrame, Boolean Flip)
+            float width, float height, Fixture ObjectPhysic, int i_FrameCurrent, int NbFrame, Boolean Flip)
         {
+            PolygonShape poly = (PolygonShape)ObjectPhysic.Shape;
+
             this.NbFrame = (float)NbFrame;
             Vertices = new VertexPositionNormalTexture[4];
             Indexes = new short[6];
@@ -37,25 +44,13 @@ namespace gameBungee
             Normal = normal;
             Up = up;
 
+            Transform xf;
+            ObjectPhysic.Body.GetTransform(out xf);
             // Calculate the quad corners
-            if (!Flip)
-            {
-                Left = Vector3.Cross(normal, Up);
-                Vector3 uppercenter = (Up * height / 2) + origin;
-                UpperLeft = uppercenter + (Left * width / 2);
-                UpperRight = uppercenter - (Left * width / 2);
-                LowerLeft = UpperLeft - (Up * height);
-                LowerRight = UpperRight - (Up * height);
-            }
-            else
-            {
-                Left = Vector3.Cross(normal, Up);
-                Vector3 uppercenter = (Up * height / 2) + origin;
-                UpperLeft = uppercenter + (Left * width / 2);
-                UpperRight = uppercenter - (Left * width / 2);
-                LowerLeft = UpperLeft - (Up * height);
-                LowerRight = UpperRight - (Up * height); 
-            }
+            UpperLeft = new Vector3(MathUtils.Multiply(ref xf, poly.Vertices[3]), 0);
+            UpperRight = new Vector3(MathUtils.Multiply(ref xf, poly.Vertices[2]), 0);
+            LowerLeft = new Vector3(MathUtils.Multiply(ref xf, poly.Vertices[0]), 0);
+            LowerRight = new Vector3(MathUtils.Multiply(ref xf, poly.Vertices[1]), 0);
 
             FillVertices(i_FrameCurrent, Flip);
         }

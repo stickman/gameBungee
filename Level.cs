@@ -20,30 +20,9 @@ namespace gameBungee
 {
     class Level
     {
-        World worldPhysic;
         ContentManager content;
-        List<FarseerPhysics.Dynamics.Joints.SliderJoint> jointList;
-        GraphicsDevice graphics;
-        //private static VertexDeclaration _vertexDeclaration;
-        //private static BasicEffect _effect;
-        //private Matrix proj;
-        //private Matrix view;
-        
+        GraphicsDevice graphics;        
         SpriteFont spriteFont;
-
-        ObjCercle obj1;
-        
-        ObjRectange obj2;
-        ObjRectange obj21;
-        ObjRectange obj22;
-        ObjRectange obj23;
-
-        ObjRectange platform1;
-        ObjRectange platform2;
-
-        ObjPolygon  obj3;
-        ObjPolygon  obj4;
-
         Character Player;
         PlayerController Controller;
 
@@ -54,7 +33,7 @@ namespace gameBungee
             Width = width;
             Height = height;
 
-            worldPhysic = new World(new Vector2(0, -80.0f));
+            EnvironmentVariable.worldPhysic = new World(new Vector2(0, -80.0f));
             content = new ContentManager(serviceProvider, "Content");
         }
 
@@ -62,59 +41,16 @@ namespace gameBungee
         {
             this.graphics = Graphics;
             //_vertexDeclaration = new VertexDeclaration(VertexPositionColor.VertexDeclaration.GetVertexElements());
-            CameraController.Inialized(new Rectangle(Width / 4, Height / 4, Width / 2, Height / 2), EnvironmentVariable.graphics.GraphicsDevice);
-            
-            Texture2D texture = Content.Load<Texture2D>("textures/Idle");
-            Player = new Character(texture, worldPhysic, Content, CameraController.effect);
-
-            Controller = new PlayerController();
+            CameraController.Inialized(new Rectangle(Width / 3, Height / 3, Width / 3, Height / 3), EnvironmentVariable.graphics.GraphicsDevice);
 
             this.spriteFont = Content.Load<SpriteFont>("font/Hud");
 
-            //obj1 = new ObjCercle(new Vector2(0, 0), 1, 0.0f, worldPhysic);
-            //obj1.addDisplayer();
+            Texture2D texture = Content.Load<Texture2D>("textures/Idle");
+            Player = new Character(texture, EnvironmentVariable.worldPhysic, EnvironmentVariable.content, CameraController.effect,new Vector2(0,20));
 
-            obj2 = new ObjRectange(new Vector2(0, -30), 80, 5, 0.0f, worldPhysic, BodyType.Static);
-            obj2.addDisplayer();
-            obj21 = new ObjRectange(new Vector2(80, 0), 10, 5, (float)Math.PI/2.0f, worldPhysic, BodyType.Static);
-            obj21.addDisplayer();
-            obj22 = new ObjRectange(new Vector2(-80, 0), 10, 5, (float)Math.PI / 2.0f, worldPhysic, BodyType.Static);
-            obj22.addDisplayer();
-            obj23 = new ObjRectange(new Vector2(0, 30), 80, 5, 0.0f, worldPhysic, BodyType.Static);
-            obj23.addDisplayer();
+            Controller = new PlayerController();
 
-            platform1 = new ObjRectange(new Vector2(-30, 0), 20, 5, 0.0f, worldPhysic, BodyType.Static);
-            platform1.addDisplayer();
-            platform2 = new ObjRectange(new Vector2(25, -10), 30, 5, 0.0f, worldPhysic, BodyType.Static);
-            platform2.addDisplayer();
 
-            List<Vector2> vertlist = new List<Vector2>();
-            vertlist.Add(new Vector2(-40, 0));
-            vertlist.Add(new Vector2(-30, -15));
-            vertlist.Add(new Vector2(-20, -17));
-            vertlist.Add(new Vector2(0, -30));
-            vertlist.Add(new Vector2(20, -17));
-            vertlist.Add(new Vector2(30, -15));
-            vertlist.Add(new Vector2(40, 0));
-            vertlist.Add(new Vector2(40, -40));
-            vertlist.Add(new Vector2(-40, -40));
-
-            //obj3 = new ObjPolygon(vertlist, BodyType.Static, worldPhysic);
-            //obj3.addDisplayer();
-            //obj3.setFriction(1.0f);
-
-            //vertlist.Clear();
-            //vertlist.Add(new Vector2(-10, -10 - 10));
-            //vertlist.Add(new Vector2(10, -10 - 10));
-            //vertlist.Add(new Vector2(10, 20 - 10));
-            //vertlist.Add(new Vector2(-10, 20 - 10));
-            //obj4 = new ObjPolygon(vertlist, BodyType.Static, worldPhysic);
-            //obj4.addDisplayer();
-        }
-        
-            private void JoinObject(Fixture Obj1, Fixture Obj2, Vector2 AnchorPoint1, Vector2 AnchorPoint2, float minLength, float maxLength)
-        {
-            jointList.Add(JointFactory.CreateSliderJoint(worldPhysic, Obj1.Body, Obj2.Body, AnchorPoint1, AnchorPoint2, minLength, maxLength));
         }
 
         public void Update(GameTime gameTime)
@@ -125,7 +61,7 @@ namespace gameBungee
 
             Controller.UpdateInteraction(Player, graphics);
 
-            worldPhysic.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.002f);
+            EnvironmentVariable.worldPhysic.Step((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.002f);
             Player.update();
             CameraController.update(Player, EnvironmentVariable.graphics.GraphicsDevice);
         }
@@ -155,23 +91,29 @@ namespace gameBungee
 
             CameraController.effect.Techniques[0].Passes[0].Apply();
 
+            foreach (ObjCercle c in EnvironmentVariable.lCercle)
+                c.Draw();
+            foreach (ObjRectange r in EnvironmentVariable.lRectangle)
+            {
+                if (r.Texture == TextureImg.Null)
+                    r.Draw();
+            }
 
-            //obj1.Draw(gameTime, spriteBatch, SpriteEffects.None);
-            //obj1.Draw(graphics);
-            obj2.Draw();
+            foreach (ObjCercle c in EnvironmentVariable.lCerclePol)
+                c.Draw();
 
-            obj21.Draw();
-            obj22.Draw();
-            obj23.Draw();
+            foreach (ObjEdge e in EnvironmentVariable.lEdge)
+                e.Draw();
 
-            platform1.Draw();
-            platform2.Draw();
-
-            //obj2.Draw(gameTime, spriteBatch, SpriteEffects.None);
-            //obj3.Draw(graphics);
-            //obj4.Draw(graphics);
+            foreach (ObjPolygon p in EnvironmentVariable.lPolygon)
+                p.Draw();
 
             Player.Draw(gameTime);
+            foreach (ObjRectange r in EnvironmentVariable.lRectangle)
+            {
+                if (r.Texture != TextureImg.Null)
+                    r.Draw(gameTime, false);
+            }
 
             spriteBatch.Begin();
             spriteBatch.DrawString(this.spriteFont, texte, new Vector2(this.graphics.Viewport.Width - taille.X, 5), Color.Green);

@@ -43,7 +43,7 @@ namespace gameBungee
 
             if (gamePadState.IsButtonDown(Buttons.DPadLeft) ||
                 keyboardState.IsKeyDown(Keys.Left) ||
-                keyboardState.IsKeyDown(Keys.Q))
+                keyboardState.IsKeyDown(Keys.A))
             {
                 InteractionLeft();
 
@@ -64,11 +64,12 @@ namespace gameBungee
             }
             if (keyboardState.IsKeyDown(Keys.S))
             {
-                InteractionButtonS();
+                if (Player.bulletJuncture != null && Player.bulletJuncture.isHung)
+                    InteractionButtonS();
             }
             if (gamePadState.IsButtonDown(Buttons.A) ||
                  keyboardState.IsKeyDown(Keys.Space) ||
-                 keyboardState.IsKeyDown(Keys.Z))
+                 keyboardState.IsKeyDown(Keys.W))
             {
                 InteractionButtonA();
 
@@ -79,7 +80,7 @@ namespace gameBungee
                  keyboardState.IsKeyDown(Keys.Right) ||
                  keyboardState.IsKeyDown(Keys.D)) && !(gamePadState.IsButtonDown(Buttons.DPadLeft) ||
                 keyboardState.IsKeyDown(Keys.Left) ||
-                keyboardState.IsKeyDown(Keys.Q)))
+                keyboardState.IsKeyDown(Keys.A)))
             {
                 Vector2 t1 = -Player.PlayerPhysic.FixtureObject.Body.LinearVelocity;
                 Vector2 t2 = new Vector2(0.0f, 0.0f);
@@ -235,14 +236,15 @@ namespace gameBungee
                             if (Player.bulletJuncture != null && Player.bulletJuncture.isHung)
                             {
                                 Vector2 t2 = Vector2.Zero;
-                                Vector2 direction = Player.bulletJuncture.positionBullet - Player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
+                                //Vector2 direction = Player.bulletJuncture.positionBullet - Player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
+                                Vector2 direction = Player.bulletJuncture.juncture.WorldAnchorA - Player.bulletJuncture.juncture.WorldAnchorB;
                                 direction.Normalize();
                                 Vector2 t1 = direction * 1000f;
 
                                 Player.PlayerPhysic.FixtureObject.Body.ApplyLinearImpulse(ref t1, ref t2);
                                 Player.PlayerPhysic.FixtureObject.Body.Awake = true;
 
-                                Player.bulletJuncture.juncture.Length -= 10;
+                                Player.bulletJuncture.juncture.Length -= 0.5f;
                             }
                             else
                             {
@@ -261,14 +263,14 @@ namespace gameBungee
                 if (Player.bulletJuncture != null && Player.bulletJuncture.isHung)
                 {
                     Vector2 t2 = Vector2.Zero;
-                    Vector2 direction = Player.bulletJuncture.positionBullet - Player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
+                    Vector2 direction = Player.bulletJuncture.juncture.WorldAnchorA - Player.bulletJuncture.juncture.WorldAnchorB;
                     direction.Normalize();
                     Vector2 t1 = direction * 1000f;
 
                     Player.PlayerPhysic.FixtureObject.Body.ApplyLinearImpulse(ref t1, ref t2);
                     Player.PlayerPhysic.FixtureObject.Body.Awake = true;
 
-                    Player.bulletJuncture.juncture.Length -= 10;
+                    Player.bulletJuncture.juncture.Length -= 0.5f;
                 }
             }
         }
@@ -276,14 +278,14 @@ namespace gameBungee
         private void InteractionButtonS()
         {
             Vector2 t2 = Vector2.Zero;
-            Vector2 direction = Player.bulletJuncture.positionBullet - Player.ObjectPhysicCircleTete.FixtureObject.Body.Position;
+            Vector2 direction = Player.bulletJuncture.juncture.WorldAnchorA - Player.bulletJuncture.juncture.WorldAnchorB;
             direction.Normalize();
             Vector2 t1 = direction * -1000f;
 
             Player.PlayerPhysic.FixtureObject.Body.ApplyLinearImpulse(ref t1, ref t2);
             Player.PlayerPhysic.FixtureObject.Body.Awake = true;
 
-            Player.bulletJuncture.juncture.Length += 10;
+            Player.bulletJuncture.juncture.Length += 0.5f;
 
         }
 
